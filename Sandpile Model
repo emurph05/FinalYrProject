@@ -1,1 +1,60 @@
-jhvhjv
+import random
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
+
+# size of the grid (10x10)
+L = 100
+
+# create empty grid
+grid = np.zeros((L, L), dtype=int)
+
+grains_added = 0  # tracker
+
+
+def topple_one():
+    for x in range(L):
+        for y in range(L):
+            if grid[x, y] >= 4:
+                grid[x, y] -= 4
+                if x > 0:   grid[x-1, y] += 1
+                if x < L-1: grid[x+1, y] += 1
+                if y > 0:   grid[x, y-1] += 1
+                if y < L-1: grid[x, y+1] += 1
+                return True
+    return False
+
+
+def update(frame):
+    global grains_added
+
+    # always drop one grain
+    x = random.randint(0, L-1)
+    y = random.randint(0, L-1)
+    grid[x, y] += 1
+    grains_added += 1
+
+    # then topple one site if possible (buffer)
+    topple_one()
+
+    img.set_data(np.clip(grid, 0, 4))
+    ax.set_title(f"2D Sandpile — Grains added: {grains_added}")
+    return (img,)
+
+
+
+fig, ax = plt.subplots()
+ax.set_xticks([])
+ax.set_yticks([])
+ax.set_title("2D Sandpile")
+
+cmap = plt.cm.colors.ListedColormap(
+    ["white", "blue", "green", "red", "black"]
+)
+
+img = ax.imshow(grid, cmap=cmap, vmin=0, vmax=4, interpolation="nearest")
+
+ani = FuncAnimation(fig, update, interval=150, blit=False)
+
+plt.show()
+ 
