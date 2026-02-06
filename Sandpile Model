@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
 # size of the grid (10x10)
-L = 100
+L = 30
 
 # create empty grid
 grid = np.zeros((L, L), dtype=int)
@@ -28,14 +28,14 @@ def topple_one():
 def update(frame):
     global grains_added
 
-    # always drop one grain
     x = random.randint(0, L-1)
     y = random.randint(0, L-1)
     grid[x, y] += 1
     grains_added += 1
 
-    # then topple one site if possible (buffer)
-    topple_one()
+    # Relax until stable
+    while topple_one():
+        pass
 
     img.set_data(np.clip(grid, 0, 4))
     ax.set_title(f"2D Sandpile — Grains added: {grains_added}")
@@ -49,7 +49,7 @@ ax.set_yticks([])
 ax.set_title("2D Sandpile")
 
 cmap = plt.cm.colors.ListedColormap(
-    ["white", "blue", "green", "red", "black"]
+    ["blue", "green", "yellow", "red", "black"]
 )
 
 img = ax.imshow(grid, cmap=cmap, vmin=0, vmax=4, interpolation="nearest")
@@ -57,4 +57,5 @@ img = ax.imshow(grid, cmap=cmap, vmin=0, vmax=4, interpolation="nearest")
 ani = FuncAnimation(fig, update, interval=150, blit=False)
 
 plt.show()
+ 
  
